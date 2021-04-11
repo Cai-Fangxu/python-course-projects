@@ -71,7 +71,7 @@ class FootballNews:
                 if gif_url.find('?'):
                     gif_url = gif_url[:gif_url.find('?')]
                 gif = requests.get(gif_url).content
-                with open('{}.gif'.format(idx), 'wb') as f:
+                with open('temp_gif/{}.gif'.format(idx), 'wb') as f:
                     f.write(gif)
                     f.close()
                 self.game_report_content[idx] = 'gif'
@@ -170,7 +170,7 @@ class FootballNews:
         right_label = [QLabel() for i in range(len(self.game_report_content))]
         for idx, item in enumerate(self.game_report_content):
             if item is 'gif':
-                gif = QMovie("{}.gif".format(idx))
+                gif = QMovie("temp_gif/{}.gif".format(idx))
                 gif.setSpeed(125)
                 # the speed of gif needs some fine tuning, 125 means 1.25 times original speed
                 # the speed gets slower when using original speed
