@@ -131,9 +131,9 @@ class FootballNews:
         scroll_area.setWidget(scroll_widget)
         self.left_layout.addWidget(scroll_area)
 
-        left_label = [QLabel()]*len(self.news_list)
+        # put buttons to the left side of the window, each button is used to show a report's title
+        left_label = [QLabel() for i in range(len(self.news_list))]
         for idx, entry in enumerate(self.news_list):
-            # every report corresponds to a button, if the report is not a game report, the button is disabled.
             left_label[idx] = QPushButton()
             left_label[idx].setObjectName("{}".format(idx))
             # button's name will be used to identify which button is clicked
@@ -141,6 +141,7 @@ class FootballNews:
             left_label[idx].setText(str(idx + 1) + ": " + entry[0])
             scroll_layout.addWidget(left_label[idx])
             left_label[idx].setFixedSize(700, 50)
+            # if the report is not a game report, the corresponding button is disabled.
             if idx not in self.game_report_idx:
                 left_label[idx].setFlat(True)
                 left_label[idx].setStyleSheet("QPushButton{border: none}")
@@ -165,7 +166,7 @@ class FootballNews:
         self.right_layout.addWidget(self.right_scroll_area)
 
         # put items to the right side of the window
-        right_label = [QLabel()]*len(self.game_report_content)
+        right_label = [QLabel() for i in range(len(self.game_report_content))]
         for idx, item in enumerate(self.game_report_content):
             if item is 'gif':
                 gif = QMovie("{}.gif".format(idx))
