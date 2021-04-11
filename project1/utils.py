@@ -1,22 +1,23 @@
-import sys, os
+import sys
 import requests
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup as BSoup
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QMovie, QFont
+
 
 # This class is used to crawl and show data related to football news
 class FootballNews:
     def __init__(self):
         self.response = requests.get("https://m.dongqiudi.com/home/104")
         self.response.encoding = 'utf-8'
-        self.raw_list = bs(self.response.text, features="lxml").ul.find_all('li')
+        self.raw_list = BSoup(self.response.text, features="lxml").ul.find_all('li')
         # In the website's html source code, news' entries are contained in 'li' tags
-        self.news_list = [] # used to store titles and links of reports
+        self.news_list = []  # used to store titles and links of reports
         # note that not all reports are game reports
         self.game_report_title = []
-        self.game_report_idx=[] # used to store the index of game reports in self.news_list
-        self.game_report_content =[]
+        self.game_report_idx = []  # used to store the index of game reports in self.news_list
+        self.game_report_content = []
 
         # get the title and link of every piece of news
         for tag in self.raw_list:
@@ -42,7 +43,7 @@ class FootballNews:
         self.game_report_content = []
         response = requests.get(game_report_url)
         response.encoding = 'utf-8'
-        soup = bs(response.text, features="lxml")
+        soup = BSoup(response.text, features="lxml")
 
         # if the web page doesn't contain a subtitle called '关键事件', it's not a football game web page
         try:
@@ -51,12 +52,12 @@ class FootballNews:
         except Exception:
             return -1
 
-        #crawl data related to key moments
+        # crawl data related to key moments
         for sibling in soup.h2.next_siblings:
             if sibling.name == 'h2':
                 break
             self.game_report_content.append(sibling)
-            #data stored in game_report_content needs further processing
+            # data stored in game_report_content needs further processing
 
         for idx, item in enumerate(self.game_report_content):
             if item.img:
@@ -75,7 +76,7 @@ class FootballNews:
                     f.close()
                 self.game_report_content[idx] = 'gif'
             elif item.strings:
-                #if item has strings, they are football commentary
+                # if item has strings, they are football commentary
                 self.game_report_content[idx] = ''.join(item.strings)
             else:
                 pass
@@ -122,7 +123,7 @@ class FootballNews:
         # make a scroll area
         scroll_area = QScrollArea()
         scroll_widget = QWidget()
-        scroll_widget.setMinimumSize(800,70*len(self.news_list))
+        scroll_widget.setMinimumSize(800, 70*len(self.news_list))
         scroll_layout = QVBoxLayout()
         scroll_layout.setAlignment(Qt.AlignHCenter)
 
@@ -130,7 +131,7 @@ class FootballNews:
         scroll_area.setWidget(scroll_widget)
         self.left_layout.addWidget(scroll_area)
 
-        left_label = [QLabel() for i in range(len(self.news_list))]
+        left_label = [QLabel()]*len(self.news_list)
         for idx, entry in enumerate(self.news_list):
             # every report corresponds to a button, if the report is not a game report, the button is disabled.
             left_label[idx] = QPushButton()
@@ -148,7 +149,7 @@ class FootballNews:
 
     # used to display key moments gif and football commentary
     def ShowGameReport(self):
-        #clear the right side of the window and then construct it again
+        # clear the right side of the window and then construct it again
         try:
             self.right_scroll_area.deleteLater()
         except Exception:
@@ -164,7 +165,7 @@ class FootballNews:
         self.right_layout.addWidget(self.right_scroll_area)
 
         # put items to the right side of the window
-        right_label = [QLabel() for i in range(len(self.game_report_content))]
+        right_label = [QLabel()]*len(self.game_report_content)
         for idx, item in enumerate(self.game_report_content):
             if item is 'gif':
                 gif = QMovie("{}.gif".format(idx))
