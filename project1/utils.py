@@ -84,6 +84,7 @@ class FootballNews:
     # used to display news in a window
     def MakeWindow(self):
         self.my_window = QWidget()
+        self.my_window.setWindowTitle("Football News from 懂球帝")
         self.whole_layout = QHBoxLayout()
         self.left_layout = QVBoxLayout()
         self.right_layout = QVBoxLayout()
@@ -191,11 +192,24 @@ class FootballNews:
     # display key moments gif and football commentary of the game of the button clicked
     def ButtonClicked(self):
         # find out which button is clicked
-        button = self.my_window.sender()
-        idx = int(str(button.objectName()))
+        button_clicked = self.my_window.sender()
+        idx = int(str(button_clicked.objectName()))
 
         url = self.news_list[idx][1]
-        self.GetGameDetails(url)
+        is_ball_game_report = self.GetGameDetails(url)
+
+        # if the game reports is not a football game report, for example, a eSports game report,
+        # the button should be disabled
+        if is_ball_game_report is -1:
+            try:
+                self.right_scroll_widget.deleteLater()
+            except Exception:
+                pass
+            button_clicked.setFlat(True)
+            button_clicked.setStyleSheet("QPushButton{border: none}")
+            button_clicked.setEnabled(False)
+            return
+
         self.ShowGameReport()
 
 
